@@ -17,6 +17,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
     jclass ArrayList = (*env).FindClass("java/util/ArrayList");
     jclass World = (*env).FindClass("net/minecraft/world/World");
     jclass IWorldEventListener = (*env).FindClass("net/minecraft/world/IWorldEventListener");
+    jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
     jobject EMPTY;
     if (ItemStack != nullptr) {
         jfieldID EMPTY_ID = (*env).GetStaticFieldID(ItemStack, "field_190927_a", "Lnet/minecraft/item/ItemStack;");
@@ -90,7 +91,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                 (*env).SetIntField(entity,revengeTimer,0);
             }
             jfieldID activePotionsMap = (*env).GetFieldID(EntityLivingBase, "field_70713_bf",
-                                                          "Ljava/util/Map<Lnet/minecraft/potion/Potion;Lnet/minecraft/potion/PotionEffect;>;");
+                                                          "Ljava/util/Map;");
             if(activePotionsMap != nullptr){
                 jclass HashMap = (*env).FindClass("java/util/HashMap");
                 if(HashMap != nullptr){
@@ -105,13 +106,13 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                 jobject manager = (*env).GetObjectField(entity,dataManager);
                 if(manager != nullptr){
                     jfieldID HEALTH_ID = (*env).GetStaticFieldID(EntityLivingBase, "field_184632_c",
-                                                                 "Lnet/minecraft/network/datasync/DataParameter<Ljava/lang/Float;>;");
+                                                                 "Lnet/minecraft/network/datasync/DataParameter;");
                     if(HEALTH_ID != nullptr){
                         jobject HEALTH = (*env).GetStaticObjectField(EntityLivingBase, HEALTH_ID);
                         if (HEALTH != nullptr) {
-                            jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
                             if(EntityDataManager != nullptr){
-                                jmethodID set = (*env).GetMethodID(EntityDataManager,"func_187227_b","<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;TT;)V");
+                                jmethodID set = (*env).GetMethodID(EntityDataManager, "func_187227_b",
+                                                                   "(Lnet/minecraft/network/datasync/DataParameter;Ljava/lang/Object;)V");
                                 if(set != nullptr){
                                     (*env).CallVoidMethod(manager,set,HEALTH,0.0f);
                                 }
@@ -176,15 +177,13 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                     jobject manager = (*env).GetObjectField(entity, dataManager);
                     if (manager != nullptr) {
                         jfieldID AI_FLAGS_ID = (*env).GetStaticFieldID(EntityLivingBase, "field_184654_a",
-                                                                       "Lnet/minecraft/network/datasync/DataParameter<Ljava/lang/Byte;>;");
+                                                                       "Lnet/minecraft/network/datasync/DataParameter;");
                         if (AI_FLAGS_ID != nullptr) {
                             jobject AI_FLAGS = (*env).GetStaticObjectField(EntityLivingBase, AI_FLAGS_ID);
                             if (AI_FLAGS != nullptr) {
-                                jclass EntityDataManager = (*env).FindClass(
-                                        "net/minecraft/network/datasync/EntityDataManager");
                                 if (EntityDataManager != nullptr) {
                                     jmethodID set = (*env).GetMethodID(EntityDataManager, "func_187227_b",
-                                                                       "<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;TT;)V");
+                                                                       "(Lnet/minecraft/network/datasync/DataParameter;Ljava/lang/Object;)V");
                                     if (set != nullptr) {
                                         (*env).CallVoidMethod(manager, set, AI_FLAGS, (jbyte) 1);
                                     }
@@ -195,18 +194,18 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                 }
                 if (NonNullList != nullptr) {
                     jmethodID constructor = (*env).GetMethodID(NonNullList, "withSize",
-                                                               "<E:Ljava/lang/Object;>(ITE;)Lnet/minecraft/util/NonNullList<TE;>;");
+                                                               "(ILjava/lang/Object;)Lnet/minecraft/util/NonNullList;");
                     if (constructor != nullptr) {
                         if (EMPTY != nullptr) {
                             jfieldID inventoryHands = (*env).GetFieldID(EntityLiving, "field_184656_bv",
-                                                                        "Lnet/minecraft/util/NonNullList<Lnet/minecraft/item/ItemStack;>;");
+                                                                        "Lnet/minecraft/util/NonNullList;");
                             if (inventoryHands != nullptr) {
                                 (*env).SetObjectField(entity, inventoryHands,
                                                       (*env).NewObject(NonNullList, constructor, 2, EMPTY));
                             }
 
                             jfieldID inventoryArmor = (*env).GetFieldID(EntityLiving, "field_184657_bw",
-                                                                        "Lnet/minecraft/util/NonNullList<Lnet/minecraft/item/ItemStack;>;");
+                                                                        "Lnet/minecraft/util/NonNullList;");
                             if (inventoryArmor != nullptr) {
                                 (*env).SetObjectField(entity, inventoryArmor,
                                                       (*env).NewObject(NonNullList, constructor, 4, EMPTY));
@@ -217,11 +216,11 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                 if ((*env).IsInstanceOf(entity, EntityPlayer)) {
                     if (InventoryBasic != nullptr) {
                         jfieldID inventoryContents = (*env).GetFieldID(InventoryBasic, "field_70482_c",
-                                                                       "Lnet/minecraft/util/NonNullList<Lnet/minecraft/item/ItemStack;>;");
+                                                                       "Lnet/minecraft/util/NonNullList;");
                         if (inventoryContents != nullptr) {
                             if (NonNullList != nullptr) {
                                 jmethodID constructor = (*env).GetMethodID(NonNullList, "withSize",
-                                                                           "<E:Ljava/lang/Object;>(ITE;)Lnet/minecraft/util/NonNullList<TE;>;");
+                                                                           "(ILjava/lang/Object;)Lnet/minecraft/util/NonNullList;");
                                 if (constructor != nullptr) {
                                     jfieldID enderChest = (*env).GetFieldID(EntityPlayer, "field_71078_a",
                                                                             "Lnet/minecraft/inventory_id/InventoryEnderChest;");
@@ -236,7 +235,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                         jobject inventory = (*env).GetObjectField(entity, inventory_id);
                                         if (InventoryPlayer != nullptr) {
                                             jfieldID mainInventory = (*env).GetFieldID(InventoryPlayer, "field_70462_a",
-                                                                                       "Lnet/minecraft/util/NonNullList<Lnet/minecraft/item/ItemStack;>;");
+                                                                                       "Lnet/minecraft/util/NonNullList;");
                                             if (mainInventory != nullptr) {
                                                 (*env).SetObjectField(inventory, mainInventory,
                                                                       (*env).NewObject(NonNullList, constructor, 36,
@@ -244,7 +243,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                             }
                                             jfieldID armorInventory = (*env).GetFieldID(InventoryPlayer,
                                                                                         "field_70460_b",
-                                                                                        "Lnet/minecraft/util/NonNullList<Lnet/minecraft/item/ItemStack;>;");
+                                                                                        "Lnet/minecraft/util/NonNullList;");
                                             if (armorInventory != nullptr) {
                                                 (*env).SetObjectField(inventory, armorInventory,
                                                                       (*env).NewObject(NonNullList, constructor, 4,
@@ -252,7 +251,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                             }
                                             jfieldID offHandInventory = (*env).GetFieldID(InventoryPlayer,
                                                                                           "field_184439_c",
-                                                                                          "Lnet/minecraft/util/NonNullList<Lnet/minecraft/item/ItemStack;>;");
+                                                                                          "Lnet/minecraft/util/NonNullList;");
                                             if (offHandInventory != nullptr) {
                                                 (*env).SetObjectField(inventory, offHandInventory,
                                                                       (*env).NewObject(NonNullList, constructor, 1,
@@ -268,7 +267,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                                 if (Constructor != nullptr) {
                                                     jfieldID allInventories = (*env).GetFieldID(InventoryPlayer,
                                                                                                 "field_184440_g",
-                                                                                                "Ljava/util/List<Lnet/minecraft/util/NonNullList<Lnet/minecraft/item/ItemStack;>;>;");
+                                                                                                "Ljava/util/List;");
                                                     (*env).SetObjectField(inventory, allInventories,
                                                                           (*env).NewObject(ArrayList, Constructor));
                                                 }
@@ -291,23 +290,26 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                         jmethodID remove = (*env).GetMethodID(ArrayList, "remove", "(Ljava/lang/Object;)Z");
                         if (remove != nullptr) {
                             jfieldID playerEntities_id = (*env).GetFieldID(World, "field_73010_i",
-                                                                           "Ljava/util/List<Lnet/minecraft/entity/player/EntityPlayer;>;");
+                                                                           "Ljava/util/List;");
                             if (playerEntities_id != nullptr) {
                                 jobject playerEntities = (*env).GetObjectField(world, playerEntities_id);
                                 (*env).CallBooleanMethod(playerEntities, remove, entity);
                             }
 
                             jfieldID weatherEffects_id = (*env).GetFieldID(World, "field_73007_j",
-                                                                           "Ljava/util/List<Lnet/minecraft/entity/Entity;>;");
+                                                                           "Ljava/util/List;");
                             if (weatherEffects_id != nullptr) {
                                 jobject weatherEffects = (*env).GetObjectField(world, weatherEffects_id);
                                 (*env).CallBooleanMethod(weatherEffects, remove, entity);
                             }
                         }
+
+                        jmethodID list_size = (*env).GetMethodID(ArrayList, "size", "()I");
+                        jmethodID list_get = (*env).GetMethodID(ArrayList, "get", "(I)Ljava/lang/Object;");;
                         {
                             if (IWorldEventListener != nullptr) {
                                 jfieldID eventListeners = (*env).GetFieldID(World, "field_73021_x",
-                                                                            "Ljava/util/List<Lnet/minecraft/world/IWorldEventListener;>;");
+                                                                            "Ljava/util/List;");
 
                             }
                         }
