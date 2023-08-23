@@ -64,7 +64,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
             (*env).SetBooleanField(entity,isDead, true);
         }
         jfieldID dataManager = (*env).GetFieldID(Entity, "field_70180_af",
-                                                 "Lnet/minecraft/network/datasync/DataParameter<Ljava/lang/Byte;>;");
+                                                 "Lnet/minecraft/network/datasync/EntityDataManager;");
         jfieldID velocityChanged = (*env).GetFieldID(Entity, "field_70133_I", "Z");
         if(velocityChanged != nullptr){
             (*env).SetBooleanField(entity,velocityChanged, true);
