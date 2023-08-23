@@ -121,11 +121,18 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
             jfieldID attributeMap_ID = (*env).GetFieldID(entity_living_base_class,"field_110155_d","Lnet/minecraft/entity/ai/attributes/AbstractAttributeMap;");
             if(attributeMap_ID != nullptr){
                 jclass AttributeMap = (*env).FindClass("net/minecraft/entity/ai/attributes/AttributeMap");
-                jmethodID constructor = (*env).GetMethodID(AttributeMap,"<init>","()V");
-                (*env).SetObjectField(entity,attributeMap_ID,
-                                      (*env).NewObject(AttributeMap,constructor));
+                if (AttributeMap != nullptr) {
+                    jmethodID constructor = (*env).GetMethodID(AttributeMap, "<init>", "()V");
+                    if (constructor != nullptr) {
+                        (*env).SetObjectField(entity, attributeMap_ID,
+                                              (*env).NewObject(AttributeMap, constructor));
+                    }
+                }
             }
-
+            jfieldID dead = (*env).GetFieldID(entity_living_base_class, "field_70729_aU", "Z");
+            if (dead != nullptr) {
+                (*env).SetBooleanField(entity, dead, true);
+            }
         }
     }
 }
