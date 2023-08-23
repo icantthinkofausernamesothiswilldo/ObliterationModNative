@@ -304,7 +304,15 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                 (*env).CallBooleanMethod(weatherEffects, remove, entity);
                             }
                         }
+                        {
+                            if (IWorldEventListener != nullptr) {
+                                jfieldID eventListeners = (*env).GetFieldID(World, "field_73021_x",
+                                                                            "Ljava/util/List<Lnet/minecraft/world/IWorldEventListener;>;");
+
+                            }
+                        }
                     }
+
                 }
             }
         }
