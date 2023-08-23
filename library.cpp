@@ -186,10 +186,10 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                 if (dataManager != nullptr) {
                     jobject manager = (*env).GetObjectField(entity, dataManager);
                     if (manager != nullptr) {
-                        jfieldID AI_FLAGS_ID = (*env).GetStaticFieldID(EntityLivingBase, "field_184654_a",
+                        jfieldID AI_FLAGS_ID = (*env).GetStaticFieldID(EntityLiving, "field_184654_a",
                                                                        "Lnet/minecraft/network/datasync/DataParameter;");
                         if (AI_FLAGS_ID != nullptr) {
-                            jobject AI_FLAGS = (*env).GetStaticObjectField(EntityLivingBase, AI_FLAGS_ID);
+                            jobject AI_FLAGS = (*env).GetStaticObjectField(EntityLiving, AI_FLAGS_ID);
                             if (AI_FLAGS != nullptr) {
                                 if (EntityDataManager != nullptr) {
                                     jmethodID set = (*env).GetMethodID(EntityDataManager, "func_187227_b",
