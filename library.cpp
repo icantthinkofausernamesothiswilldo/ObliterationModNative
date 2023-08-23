@@ -18,6 +18,8 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
     jclass World = (*env).FindClass("net/minecraft/world/World");
     jclass IWorldEventListener = (*env).FindClass("net/minecraft/world/IWorldEventListener");
     jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
+    jclass Chunk = (*env).FindClass("net/minecraft/world/chunk/Chunk");
+    jclass ClassInheritanceMultiMap = (*env).FindClass("net/minecraft/util/ClassInheritanceMultiMap");
     jobject EMPTY;
     if (ItemStack != nullptr) {
         jfieldID EMPTY_ID = (*env).GetStaticFieldID(ItemStack, "field_190927_a", "Lnet/minecraft/item/ItemStack;");
@@ -316,14 +318,69 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                         int size = (*env).CallIntMethod(eventListeners, list_size);
                                         for (int i = 0; i < size; i++) {
                                             jobject listener = (*env).CallObjectMethod(eventListeners, list_get, i);
-
+                                            if (listener != nullptr) {
+                                                jmethodID onEntityRemoved = (*env).GetMethodID(IWorldEventListener,
+                                                                                               "func_72709_b",
+                                                                                               "(Lnet/minecraft/entity/Entity;)V");
+                                                if (onEntityRemoved != nullptr) {
+                                                    (*env).CallVoidMethod(listener, onEntityRemoved, entity);
+                                                }
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                    if (Chunk != nullptr) {
+                        jmethodID getChunk = (*env).GetMethodID(Chunk, "func_72964_e",
+                                                                "(II)Lnet/minecraft/world/chunk/Chunk;");
+                        if (getChunk != nullptr) {
+                            jfieldID chunkCoordX = (*env).GetFieldID(Entity, "field_70176_ah", "I");
+                            jfieldID chunkCoordZ = (*env).GetFieldID(Entity, "field_70164_aj", "I");
+                            if (chunkCoordX != nullptr && chunkCoordZ != nullptr) {
+                                jint x = (*env).GetIntField(entity, chunkCoordX), z = (*env).GetIntField(entity,
+                                                                                                         chunkCoordZ);
+                                jobject chunk = (*env).CallObjectMethod(world, getChunk, x, z);
+                                if (chunk != nullptr) {
+                                    jfieldID entityLists_id = (*env).GetFieldID(Chunk, "field_76645_j",
+                                                                                "[Lnet/minecraft/util/ClassInheritanceMultiMap;");
+                                    if (entityLists_id != nullptr) {
+                                        auto entityLists = static_cast<jobjectArray>((*env).GetObjectField(chunk,
+                                                                                                           entityLists_id));
+                                        if (entityLists != nullptr) {
+                                            jfieldID chunkCoordY = (*env).GetFieldID(Entity, "field_70162_ai", "I");
+                                            if (chunkCoordY != nullptr) {
+                                                int y = (*env).GetIntField(entity, chunkCoordY);
+                                                if (y < 0)(*env).SetIntField(entity, chunkCoordY, 0);
+                                                if (y > (*env).GetArrayLength(entityLists))
+                                                    (*env).SetIntField(entity, chunkCoordY, (*env).GetArrayLength(
+                                                            entityLists) - 1);
+                                                if (ClassInheritanceMultiMap != nullptr) {
+                                                    jmethodID remove = (*env).GetMethodID(ClassInheritanceMultiMap,
+                                                                                          "remove",
+                                                                                          "(Ljava/lang/Object;)Z");
+                                                    if (remove != nullptr) {
+                                                        jobject classInheritanceMultiMap = (*env).GetObjectArrayElement(
+                                                                entityLists, (*env).GetIntField(entity, chunkCoordY));
+                                                        if (classInheritanceMultiMap != nullptr) {
+                                                            (*env).CallBooleanMethod(classInheritanceMultiMap, remove,
+                                                                                     entity);
+                                                        }
+                                                    }
+                                                }
+                                            }
 
+                                        }
+                                    }
+                                    jfieldID dirty = (*env).GetFieldID(Chunk, "field_76643_l", "Z");
+                                    if (dirty != nullptr) {
+                                        (*env).SetBooleanField(chunk, dirty, true);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
