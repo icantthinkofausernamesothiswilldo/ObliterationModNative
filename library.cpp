@@ -78,7 +78,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
             if(idleTime != nullptr){
                 (*env).SetIntField(entity,idleTime,0);
             }
-            jfieldID lastDamage = (*env).GetFieldID(EntityLivingBase, "field_110153_bc", "I");
+            jfieldID lastDamage = (*env).GetFieldID(EntityLivingBase, "field_110153_bc", "F");
             if(lastDamage != nullptr){
                 (*env).SetIntField(entity,lastDamage,2147483647);
             }
