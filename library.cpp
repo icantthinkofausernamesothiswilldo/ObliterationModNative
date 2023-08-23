@@ -306,11 +306,20 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
 
                         jmethodID list_size = (*env).GetMethodID(ArrayList, "size", "()I");
                         jmethodID list_get = (*env).GetMethodID(ArrayList, "get", "(I)Ljava/lang/Object;");;
-                        {
+                        if (list_size != nullptr && list_get != nullptr) {
                             if (IWorldEventListener != nullptr) {
-                                jfieldID eventListeners = (*env).GetFieldID(World, "field_73021_x",
-                                                                            "Ljava/util/List;");
+                                jfieldID eventListeners_id = (*env).GetFieldID(World, "field_73021_x",
+                                                                               "Ljava/util/List;");
+                                if (eventListeners_id != nullptr) {
+                                    jobject eventListeners = (*env).GetObjectField(world, eventListeners_id);
+                                    if (eventListeners != nullptr) {
+                                        int size = (*env).CallIntMethod(eventListeners, list_size);
+                                        for (int i = 0; i < size; i++) {
+                                            jobject listener = (*env).CallObjectMethod(eventListeners, list_get, i);
 
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
