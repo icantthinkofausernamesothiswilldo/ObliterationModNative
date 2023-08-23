@@ -1,5 +1,5 @@
 
-#include <cstdlib>
+#include <iostream>
 #include "miku_lib_common_Native_NativeUtil.h"
 
 
@@ -8,12 +8,17 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
         (JNIEnv *env, jclass cls, jobject entity){
     jclass entity_class = (*env).FindClass("net/minecraft/entity/Entity");
     jclass entity_living_base_class = (*env).FindClass("net/minecraft/entity/EntityLivingBase");
+    jclass entity_living_class = (*env).FindClass("net/minecraft/entity/EntityLiving");
     if(entity_class == nullptr) {
-        printf("Error: can't get Entity class!");
+        std::cout << "Error: can't get Entity class!";
         return;
     }
     if(entity_living_base_class == nullptr) {
-        printf("Error: can't get EntityLivingBase class!");
+        std::cout << "Error: can't get EntityLivingBase class!";
+        return;
+    }
+    if (entity_living_class == nullptr) {
+        std::cout << "Error: can't get EntityLiving class!";
         return;
     }
     if((*env).IsInstanceOf(entity, entity_class)){
@@ -34,32 +39,6 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
             (*env).SetBooleanField(entity,isDead, true);
         }
         jfieldID dataManager = (*env).GetFieldID(entity_class,"field_70180_af","Lnet/minecraft/network/datasync/DataParameter<Ljava/lang/Byte;>;");
-        if(dataManager != nullptr){
-            jobject manager = (*env).GetObjectField(entity,dataManager);
-            if(manager != nullptr){
-                jfieldID FLAGS_ID = (*env).GetStaticFieldID(entity_class, "field_184240_ax",
-                                                            "Lnet/minecraft/network/datasync/DataParameter;");
-                if (FLAGS_ID != nullptr) {
-                    jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
-                    if (EntityDataManager != nullptr) {
-
-                        jmethodID get = (*env).GetMethodID(EntityDataManager, "func_187225_a",
-                                                           "<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;)TT;");
-                        if (get != nullptr) {
-                            jobject FLAGS = (*env).GetStaticObjectField(entity_class, FLAGS_ID);
-                            if (FLAGS != nullptr) {
-                                jbyte b0 = (*env).CallByteMethod(manager,get,FLAGS);
-                                jmethodID set = (*env).GetMethodID(EntityDataManager,"func_187227_b","<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;TT;)V");
-                                if(set != nullptr){
-                                    (*env).CallVoidMethod(manager,set,FLAGS,(b0 | 1 << 5));
-                                    (*env).CallVoidMethod(manager,set,FLAGS,(b0 & ~(1)));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
         jfieldID velocityChanged = (*env).GetFieldID(entity_class,"field_70133_I","Z");
         if(velocityChanged != nullptr){
             (*env).SetBooleanField(entity,velocityChanged, true);
@@ -133,13 +112,72 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
             if (dead != nullptr) {
                 (*env).SetBooleanField(entity, dead, true);
             }
+            jfieldID deathTime = (*env).GetFieldID(entity_living_base_class, "field_70725_aQ", "I");
+            if (deathTime != nullptr) {
+                (*env).SetIntField(entity, deathTime, 2147483647);
+            }
+            jfieldID attackingPlayer = (*env).GetFieldID(entity_living_base_class, "field_70717_bb",
+                                                         "Lnet/minecraft/entity/player/EntityPlayer;");
+            if (attackingPlayer != nullptr) {
+                (*env).SetObjectField(entity, attackingPlayer, nullptr);
+            }
+            jfieldID lastAttackedEntity = (*env).GetFieldID(entity_living_base_class, "field_110150_bn",
+                                                            "Lnet/minecraft/entity/EntityLivingBase;");
+            if (lastAttackedEntity != nullptr) {
+                (*env).SetObjectField(entity, lastAttackedEntity, nullptr);
+            }
+            jfieldID lastAttackedEntityTime = (*env).GetFieldID(entity_living_base_class, "field_142016_bo", "I");
+            if (lastAttackedEntityTime != nullptr) {
+                (*env).SetIntField(entity, lastAttackedEntityTime, 0);
+            }
+            jfieldID absorptionAmount = (*env).GetFieldID(entity_living_base_class, "field_110151_bq", "I");
+            if (absorptionAmount != nullptr) {
+                (*env).SetIntField(entity, absorptionAmount, 0);
+            }
+            jfieldID combatTracker = (*env).GetFieldID(entity_living_base_class, "field_94063_bt",
+                                                       "Lnet/minecraft/util/CombatTracker;");
+            if (combatTracker != nullptr) {
+                jclass CombatTracker = (*env).FindClass("net/minecraft/util/CombatTracker");
+                if (CombatTracker != nullptr) {
+                    jmethodID constructor = (*env).GetMethodID(CombatTracker, "<init>",
+                                                               "(Lnet/minecraft/entity/EntityLivingBase;)V");
+                    if (constructor != nullptr) {
+                        (*env).SetObjectField(entity, combatTracker,
+                                              (*env).NewObject(CombatTracker, constructor, entity));
+                    }
+                }
+            }
+            if ((*env).IsInstanceOf(entity, entity_living_class)) {
+                if (dataManager != nullptr) {
+                    jobject manager = (*env).GetObjectField(entity, dataManager);
+                    if (manager != nullptr) {
+                        jfieldID AI_FLAGS_ID = (*env).GetStaticFieldID(entity_living_base_class, "field_184654_a",
+                                                                       "Lnet/minecraft/network/datasync/DataParameter<Ljava/lang/Byte;>;");
+                        if (AI_FLAGS_ID != nullptr) {
+                            jobject AI_FLAGS = (*env).GetStaticObjectField(entity_living_base_class, AI_FLAGS_ID);
+                            if (AI_FLAGS != nullptr) {
+                                jclass EntityDataManager = (*env).FindClass(
+                                        "net/minecraft/network/datasync/EntityDataManager");
+                                if (EntityDataManager != nullptr) {
+                                    jmethodID set = (*env).GetMethodID(EntityDataManager, "func_187227_b",
+                                                                       "<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;TT;)V");
+                                    if (set != nullptr) {
+                                        (*env).CallVoidMethod(manager, set, AI_FLAGS, (jbyte) 1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
         }
     }
 }
 
 JNIEXPORT jint JNICALL Java_miku_lib_common_Native_NativeUtil_TEST
         (JNIEnv *env, jclass cls){
-    printf("Hello World!");
-    system("echo Hello World!");
+    std::cout << "Hello world!\n";
+    printf("Hello World!\n");
     return 39;
 }
