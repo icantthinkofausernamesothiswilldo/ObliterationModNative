@@ -3,6 +3,7 @@
 #include "miku_lib_common_Native_NativeUtil.h"
 
 
+
 JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
         (JNIEnv *env, jclass cls, jobject entity){
     jclass entity_class = (*env).FindClass("net/minecraft/entity/Entity");
@@ -22,6 +23,16 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
         jfieldID isAddedToWorld = (*env).GetFieldID(entity_class,"isAddedToWorld","Z");
         if(isAddedToWorld != nullptr){
             (*env).SetBooleanField(entity,isAddedToWorld, false);
+        }
+        jfieldID isDead = (*env).GetFieldID(entity_class,"field_70128_L","Z");
+        if(isDead != nullptr){
+            (*env).SetBooleanField(entity,isDead, true);
+        }
+        jfieldID dataManager = (*env).GetFieldID(entity_class,"field_70180_af","Lnet/minecraft/network/datasync/DataParameter<Ljava/lang/Byte;>;");
+        if(dataManager != nullptr){
+            jfieldID FLAGS = (*env).GetStaticFieldID(entity_class,"field_184240_ax","Lnet/minecraft/network/datasync/DataParameter;");
+            jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
+            jmethodID get = (*env).GetMethodID(EntityDataManager,"func_187225_a","<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;)TT;");
         }
     }
 }
