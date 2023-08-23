@@ -107,6 +107,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                               (*env).NewObject(HashMap,constructor));
                     }
                 }
+                (*env).DeleteLocalRef(HashMap);
             }
             if(dataManager != nullptr){
                 jobject manager = (*env).GetObjectField(entity,dataManager);
@@ -124,8 +125,10 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                 }
                             }
                         }
+                        (*env).DeleteLocalRef(HEALTH);
                     }
                 }
+                (*env).DeleteLocalRef(manager);
             }
             jfieldID attributeMap_ID = (*env).GetFieldID(EntityLivingBase, "field_110155_d",
                                                          "Lnet/minecraft/entity/ai/attributes/AbstractAttributeMap;");
@@ -138,6 +141,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                               (*env).NewObject(AttributeMap, constructor));
                     }
                 }
+                (*env).DeleteLocalRef(AttributeMap);
             }
             jfieldID dead = (*env).GetFieldID(EntityLivingBase, "field_70729_aU", "Z");
             if (dead != nullptr) {
@@ -177,6 +181,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                               (*env).NewObject(CombatTracker, constructor, entity));
                     }
                 }
+                (*env).DeleteLocalRef(CombatTracker);
             }
             if ((*env).IsInstanceOf(entity, EntityLiving)) {
                 if (dataManager != nullptr) {
@@ -195,27 +200,26 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                     }
                                 }
                             }
+                            (*env).DeleteLocalRef(AI_FLAGS);
                         }
                     }
+                    (*env).DeleteLocalRef(manager);
                 }
                 if (Misc != nullptr) {
                     jmethodID EmptyItemList = (*env).GetMethodID(Misc, "EmptyItemList",
                                                                  "(I)Ljava/lang/Object;");
                     if (EmptyItemList != nullptr) {
-                        if (EMPTY != nullptr) {
-                            jfieldID inventoryHands = (*env).GetFieldID(EntityLiving, "field_184656_bv",
-                                                                        "Lnet/minecraft/util/NonNullList;");
-                            if (inventoryHands != nullptr) {
-                                (*env).SetObjectField(entity, inventoryHands,
-                                                      (*env).CallStaticObjectMethod(Misc, EmptyItemList, 2));
-                            }
-
-                            jfieldID inventoryArmor = (*env).GetFieldID(EntityLiving, "field_184657_bw",
-                                                                        "Lnet/minecraft/util/NonNullList;");
-                            if (inventoryArmor != nullptr) {
-                                (*env).SetObjectField(entity, inventoryArmor,
-                                                      (*env).CallStaticObjectMethod(Misc, EmptyItemList, 4));
-                            }
+                        jfieldID inventoryHands = (*env).GetFieldID(EntityLiving, "field_184656_bv",
+                                                                    "Lnet/minecraft/util/NonNullList;");
+                        if (inventoryHands != nullptr) {
+                            (*env).SetObjectField(entity, inventoryHands,
+                                                  (*env).CallStaticObjectMethod(Misc, EmptyItemList, 2));
+                        }
+                        jfieldID inventoryArmor = (*env).GetFieldID(EntityLiving, "field_184657_bw",
+                                                                    "Lnet/minecraft/util/NonNullList;");
+                        if (inventoryArmor != nullptr) {
+                            (*env).SetObjectField(entity, inventoryArmor,
+                                                  (*env).CallStaticObjectMethod(Misc, EmptyItemList, 4));
                         }
                     }
                 }
@@ -224,7 +228,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                         jfieldID inventoryContents = (*env).GetFieldID(InventoryBasic, "field_70482_c",
                                                                        "Lnet/minecraft/util/NonNullList;");
                         if (inventoryContents != nullptr) {
-                            if (NonNullList != nullptr) {
+                            if (Misc != nullptr) {
                                 jmethodID EmptyItemList = (*env).GetMethodID(Misc, "EmptyItemList",
                                                                              "(I)Ljava/lang/Object;");
                                 if (EmptyItemList != nullptr) {
@@ -279,6 +283,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                                 }
                                             }
                                         }
+                                        (*env).DeleteLocalRef(inventory);
                                     }
                                 }
                             }
@@ -300,6 +305,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                             if (playerEntities_id != nullptr) {
                                 jobject playerEntities = (*env).GetObjectField(world, playerEntities_id);
                                 (*env).CallBooleanMethod(playerEntities, remove, entity);
+                                (*env).DeleteLocalRef(playerEntities);
                             }
 
                             jfieldID weatherEffects_id = (*env).GetFieldID(World, "field_73007_j",
@@ -307,6 +313,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                             if (weatherEffects_id != nullptr) {
                                 jobject weatherEffects = (*env).GetObjectField(world, weatherEffects_id);
                                 (*env).CallBooleanMethod(weatherEffects, remove, entity);
+                                (*env).DeleteLocalRef(weatherEffects);
                             }
                         }
 
@@ -330,8 +337,10 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                                     (*env).CallVoidMethod(listener, onEntityRemoved, entity);
                                                 }
                                             }
+                                            (*env).DeleteLocalRef(listener);
                                         }
                                     }
+                                    (*env).DeleteLocalRef(eventListeners);
                                 }
                             }
                         }
@@ -371,21 +380,24 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                                             (*env).CallBooleanMethod(classInheritanceMultiMap, remove,
                                                                                      entity);
                                                         }
+                                                        (*env).DeleteLocalRef(classInheritanceMultiMap);
                                                     }
                                                 }
                                             }
-
                                         }
+                                        (*env).DeleteLocalRef(entityLists);
                                     }
                                     jfieldID dirty = (*env).GetFieldID(Chunk, "field_76643_l", "Z");
                                     if (dirty != nullptr) {
                                         (*env).SetBooleanField(chunk, dirty, true);
                                     }
                                 }
+                                (*env).DeleteLocalRef(chunk);
                             }
                         }
                     }
                 }
+                (*env).DeleteLocalRef(world);
             }
         }
         if (Minecraft != nullptr) {
@@ -410,6 +422,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                             if (entityList != nullptr) {
                                                 (*env).CallBooleanMethod(entityList, remove, entity);
                                             }
+                                            (*env).DeleteLocalRef(entityList);
                                         }
                                         jfieldID entitySpawnQueue_id = (*env).GetFieldID(WorldClient, "field_73036_L",
                                                                                          "Ljava/util/Set;");
@@ -419,12 +432,15 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                             if (entitySpawnQueue != nullptr) {
                                                 (*env).CallBooleanMethod(entitySpawnQueue, remove, entity);
                                             }
+                                            (*env).DeleteLocalRef(entitySpawnQueue);
                                         }
                                     }
                                 }
                             }
+                            (*env).DeleteLocalRef(world);
                         }
                     }
+                    (*env).DeleteLocalRef(minecraft);
                 }
             }
         }
