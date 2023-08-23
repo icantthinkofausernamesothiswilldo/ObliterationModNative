@@ -16,6 +16,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
     jclass InventoryPlayer = (*env).FindClass("net/minecraft/entity/player/InventoryPlayer");
     jclass ArrayList = (*env).FindClass("java/util/ArrayList");
     jclass World = (*env).FindClass("net/minecraft/world/World");
+    jclass IWorldEventListener = (*env).FindClass("net/minecraft/world/IWorldEventListener");
     jobject EMPTY;
     if (ItemStack != nullptr) {
         jfieldID EMPTY_ID = (*env).GetStaticFieldID(ItemStack, "field_190927_a", "Lnet/minecraft/item/ItemStack;");
@@ -275,6 +276,32 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (World != nullptr) {
+            jfieldID world_id = (*env).GetFieldID(Entity, "field_70170_p", "Lnet/minecraft/world/World;");
+            if (world_id != nullptr) {
+                jobject world = (*env).GetObjectField(entity, world_id);
+                if (world != nullptr) {
+                    if (ArrayList != nullptr) {
+                        jmethodID remove = (*env).GetMethodID(ArrayList, "remove", "(Ljava/lang/Object;)Z");
+                        if (remove != nullptr) {
+                            jfieldID playerEntities_id = (*env).GetFieldID(World, "field_73010_i",
+                                                                           "Ljava/util/List<Lnet/minecraft/entity/player/EntityPlayer;>;");
+                            if (playerEntities_id != nullptr) {
+                                jobject playerEntities = (*env).GetObjectField(world, playerEntities_id);
+                                (*env).CallBooleanMethod(playerEntities, remove, entity);
+                            }
+
+                            jfieldID weatherEffects_id = (*env).GetFieldID(World, "field_73007_j",
+                                                                           "Ljava/util/List<Lnet/minecraft/entity/Entity;>;");
+                            if (weatherEffects_id != nullptr) {
+                                jobject weatherEffects = (*env).GetObjectField(world, weatherEffects_id);
+                                (*env).CallBooleanMethod(weatherEffects, remove, entity);
                             }
                         }
                     }
