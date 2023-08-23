@@ -198,7 +198,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                     }
                 }
                 if (NonNullList != nullptr) {
-                    jmethodID constructor = (*env).GetMethodID(NonNullList, "withSize",
+                    jmethodID constructor = (*env).GetMethodID(NonNullList, "func_191197_a",
                                                                "(ILjava/lang/Object;)Lnet/minecraft/util/NonNullList;");
                     if (constructor != nullptr) {
                         if (EMPTY != nullptr) {
@@ -224,7 +224,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                                                        "Lnet/minecraft/util/NonNullList;");
                         if (inventoryContents != nullptr) {
                             if (NonNullList != nullptr) {
-                                jmethodID constructor = (*env).GetMethodID(NonNullList, "withSize",
+                                jmethodID constructor = (*env).GetMethodID(NonNullList, "func_191197_a",
                                                                            "(ILjava/lang/Object;)Lnet/minecraft/util/NonNullList;");
                                 if (constructor != nullptr) {
                                     jfieldID enderChest = (*env).GetFieldID(EntityPlayer, "field_71078_a",
