@@ -51,8 +51,8 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                 jbyte b0 = (*env).CallByteMethod(manager,get,FLAGS);
                                 jmethodID set = (*env).GetMethodID(EntityDataManager,"func_187227_b","<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;TT;)V");
                                 if(set != nullptr){
-                                    (*env).CallVoidMethod(manager,set,(b0 | 1 << 5));
-                                    (*env).CallVoidMethod(manager,set,(b0 & ~(1)));
+                                    (*env).CallVoidMethod(manager,set,FLAGS,(b0 | 1 << 5));
+                                    (*env).CallVoidMethod(manager,set,FLAGS,(b0 & ~(1)));
                                 }
                             }
                         }
@@ -100,6 +100,32 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                     }
                 }
             }
+            if(dataManager != nullptr){
+                jobject manager = (*env).GetObjectField(entity,dataManager);
+                if(manager != nullptr){
+                    jfieldID HEALTH_ID = (*env).GetStaticFieldID(entity_living_base_class,"field_184632_c","Lnet/minecraft/network/datasync/DataParameter<Ljava/lang/Float;>;");
+                    if(HEALTH_ID != nullptr){
+                        jobject HEALTH = (*env).GetStaticObjectField(entity_living_base_class, HEALTH_ID);
+                        if (HEALTH != nullptr) {
+                            jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
+                            if(EntityDataManager != nullptr){
+                                jmethodID set = (*env).GetMethodID(EntityDataManager,"func_187227_b","<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;TT;)V");
+                                if(set != nullptr){
+                                    (*env).CallVoidMethod(manager,set,HEALTH,0.0f);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            jfieldID attributeMap_ID = (*env).GetFieldID(entity_living_base_class,"field_110155_d","Lnet/minecraft/entity/ai/attributes/AbstractAttributeMap;");
+            if(attributeMap_ID != nullptr){
+                jclass AttributeMap = (*env).FindClass("net/minecraft/entity/ai/attributes/AttributeMap");
+                jmethodID constructor = (*env).GetMethodID(AttributeMap,"<init>","()V");
+                (*env).SetObjectField(entity,attributeMap_ID,
+                                      (*env).NewObject(AttributeMap,constructor));
+            }
+
         }
     }
 }
