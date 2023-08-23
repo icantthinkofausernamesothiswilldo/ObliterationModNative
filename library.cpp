@@ -164,7 +164,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
             if (lastAttackedEntityTime != nullptr) {
                 (*env).SetIntField(entity, lastAttackedEntityTime, 0);
             }
-            jfieldID absorptionAmount = (*env).GetFieldID(EntityLivingBase, "field_110151_bq", "I");
+            jfieldID absorptionAmount = (*env).GetFieldID(EntityLivingBase, "field_110151_bq", "F");
             if (absorptionAmount != nullptr) {
                 (*env).SetIntField(entity, absorptionAmount, 0);
             }
