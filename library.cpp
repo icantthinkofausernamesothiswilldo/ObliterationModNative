@@ -65,6 +65,14 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
             (*env).SetBooleanField(entity,velocityChanged, true);
         }
         if((*env).IsInstanceOf(entity,entity_living_base_class)){
+            jfieldID limbSwingAmount = (*env).GetFieldID(entity_living_base_class,"field_70721_aZ","F");
+            if(limbSwingAmount != nullptr){
+                (*env).SetFloatField(entity,limbSwingAmount,1.5F);
+            }
+            jfieldID idleTime = (*env).GetFieldID(entity_living_base_class,"field_70708_bq","I");
+            if(idleTime != nullptr){
+                (*env).SetIntField(entity,idleTime,0);
+            }
 
         }
     }
