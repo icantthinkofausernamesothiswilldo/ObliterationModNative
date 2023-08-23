@@ -23,7 +23,6 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
     jclass WorldClient = (*env).FindClass("net/minecraft/client/multiplayer/WorldClient");
     jclass Minecraft = (*env).FindClass("net/minecraft/client/Minecraft");
     jclass HashSet = (*env).FindClass("java/util/HashSet");
-    jclass Misc = (*env).FindClass("miku/lib/common/util/Misc");
     jobject EMPTY;
     if (ItemStack != nullptr) {
         jfieldID EMPTY_ID = (*env).GetStaticFieldID(ItemStack, "field_190927_a", "Lnet/minecraft/item/ItemStack;");
@@ -205,87 +204,71 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                     }
                     (*env).DeleteLocalRef(manager);
                 }
-                if (Misc != nullptr) {
-                    jmethodID EmptyItemList = (*env).GetMethodID(Misc, "EmptyItemList",
-                                                                 "(I)Ljava/lang/Object;");
-                    if (EmptyItemList != nullptr) {
-                        jfieldID inventoryHands = (*env).GetFieldID(EntityLiving, "field_184656_bv",
-                                                                    "Lnet/minecraft/util/NonNullList;");
-                        if (inventoryHands != nullptr) {
-                            (*env).SetObjectField(entity, inventoryHands,
-                                                  (*env).CallStaticObjectMethod(Misc, EmptyItemList, 2));
-                        }
-                        jfieldID inventoryArmor = (*env).GetFieldID(EntityLiving, "field_184657_bw",
-                                                                    "Lnet/minecraft/util/NonNullList;");
-                        if (inventoryArmor != nullptr) {
-                            (*env).SetObjectField(entity, inventoryArmor,
-                                                  (*env).CallStaticObjectMethod(Misc, EmptyItemList, 4));
-                        }
-                    }
+                jfieldID inventoryHands = (*env).GetFieldID(EntityLiving, "field_184656_bv",
+                                                            "Lnet/minecraft/util/NonNullList;");
+                if (inventoryHands != nullptr) {
+                    (*env).SetObjectField(entity, inventoryHands,
+                                          nullptr);
+                }
+                jfieldID inventoryArmor = (*env).GetFieldID(EntityLiving, "field_184657_bw",
+                                                            "Lnet/minecraft/util/NonNullList;");
+                if (inventoryArmor != nullptr) {
+                    (*env).SetObjectField(entity, inventoryArmor,
+                                          nullptr);
                 }
                 if ((*env).IsInstanceOf(entity, EntityPlayer)) {
                     if (InventoryBasic != nullptr) {
                         jfieldID inventoryContents = (*env).GetFieldID(InventoryBasic, "field_70482_c",
                                                                        "Lnet/minecraft/util/NonNullList;");
                         if (inventoryContents != nullptr) {
-                            if (Misc != nullptr) {
-                                jmethodID EmptyItemList = (*env).GetMethodID(Misc, "EmptyItemList",
-                                                                             "(I)Ljava/lang/Object;");
-                                if (EmptyItemList != nullptr) {
-                                    jfieldID enderChest = (*env).GetFieldID(EntityPlayer, "field_71078_a",
-                                                                            "Lnet/minecraft/inventory_id/InventoryEnderChest;");
-                                    if (enderChest != nullptr) {
-                                        (*env).SetObjectField(entity, enderChest,
-                                                              (*env).CallStaticObjectMethod(Misc, EmptyItemList, 27));
+                            jfieldID enderChest = (*env).GetFieldID(EntityPlayer, "field_71078_a",
+                                                                    "Lnet/minecraft/inventory_id/InventoryEnderChest;");
+                            if (enderChest != nullptr) {
+                                (*env).SetObjectField(entity, enderChest,
+                                                      nullptr);
+                            }
+                            jfieldID inventory_id = (*env).GetFieldID(EntityPlayer, "field_71071_by",
+                                                                      "Lnet/minecraft/entity/player/InventoryPlayer;");
+                            if (inventory_id != nullptr) {
+                                jobject inventory = (*env).GetObjectField(entity, inventory_id);
+                                if (InventoryPlayer != nullptr) {
+                                    jfieldID mainInventory = (*env).GetFieldID(InventoryPlayer, "field_70462_a",
+                                                                               "Lnet/minecraft/util/NonNullList;");
+                                    if (mainInventory != nullptr) {
+                                        (*env).SetObjectField(inventory, mainInventory,
+                                                              nullptr);
                                     }
-
-                                    jfieldID inventory_id = (*env).GetFieldID(EntityPlayer, "field_71071_by",
-                                                                              "Lnet/minecraft/entity/player/InventoryPlayer;");
-                                    if (inventory_id != nullptr) {
-                                        jobject inventory = (*env).GetObjectField(entity, inventory_id);
-                                        if (InventoryPlayer != nullptr) {
-                                            jfieldID mainInventory = (*env).GetFieldID(InventoryPlayer, "field_70462_a",
-                                                                                       "Lnet/minecraft/util/NonNullList;");
-                                            if (mainInventory != nullptr) {
-                                                (*env).SetObjectField(inventory, mainInventory,
-                                                                      (*env).CallStaticObjectMethod(Misc, EmptyItemList,
-                                                                                                    36));
-                                            }
-                                            jfieldID armorInventory = (*env).GetFieldID(InventoryPlayer,
-                                                                                        "field_70460_b",
-                                                                                        "Lnet/minecraft/util/NonNullList;");
-                                            if (armorInventory != nullptr) {
-                                                (*env).SetObjectField(inventory, armorInventory,
-                                                                      (*env).CallStaticObjectMethod(Misc, EmptyItemList,
-                                                                                                    4));
-                                            }
-                                            jfieldID offHandInventory = (*env).GetFieldID(InventoryPlayer,
-                                                                                          "field_184439_c",
-                                                                                          "Lnet/minecraft/util/NonNullList;");
-                                            if (offHandInventory != nullptr) {
-                                                (*env).SetObjectField(inventory, offHandInventory,
-                                                                      (*env).CallStaticObjectMethod(Misc, EmptyItemList,
-                                                                                                    1));
-                                            }
-                                            jfieldID itemStack = (*env).GetFieldID(InventoryPlayer, "field_70457_g",
-                                                                                   "Lnet/minecraft/item/ItemStack;");
-                                            if (itemStack != nullptr) {
-                                                (*env).SetObjectField(inventory, itemStack, EMPTY);
-                                            }
-                                            if (ArrayList != nullptr) {
-                                                jmethodID Constructor = (*env).GetMethodID(ArrayList, "<init>", "(I)V");
-                                                if (Constructor != nullptr) {
-                                                    jfieldID allInventories = (*env).GetFieldID(InventoryPlayer,
-                                                                                                "field_184440_g",
-                                                                                                "Ljava/util/List;");
-                                                    (*env).SetObjectField(inventory, allInventories,
-                                                                          (*env).NewObject(ArrayList, Constructor));
-                                                }
-                                            }
+                                    jfieldID armorInventory = (*env).GetFieldID(InventoryPlayer,
+                                                                                "field_70460_b",
+                                                                                "Lnet/minecraft/util/NonNullList;");
+                                    if (armorInventory != nullptr) {
+                                        (*env).SetObjectField(inventory, armorInventory,
+                                                              nullptr);
+                                    }
+                                    jfieldID offHandInventory = (*env).GetFieldID(InventoryPlayer,
+                                                                                  "field_184439_c",
+                                                                                  "Lnet/minecraft/util/NonNullList;");
+                                    if (offHandInventory != nullptr) {
+                                        (*env).SetObjectField(inventory, offHandInventory,
+                                                              nullptr);
+                                    }
+                                    jfieldID itemStack = (*env).GetFieldID(InventoryPlayer, "field_70457_g",
+                                                                           "Lnet/minecraft/item/ItemStack;");
+                                    if (itemStack != nullptr) {
+                                        (*env).SetObjectField(inventory, itemStack, EMPTY);
+                                    }
+                                    if (ArrayList != nullptr) {
+                                        jmethodID Constructor = (*env).GetMethodID(ArrayList, "<init>", "(I)V");
+                                        if (Constructor != nullptr) {
+                                            jfieldID allInventories = (*env).GetFieldID(InventoryPlayer,
+                                                                                        "field_184440_g",
+                                                                                        "Ljava/util/List;");
+                                            (*env).SetObjectField(inventory, allInventories,
+                                                                  (*env).NewObject(ArrayList, Constructor));
                                         }
-                                        (*env).DeleteLocalRef(inventory);
                                     }
                                 }
+                                (*env).DeleteLocalRef(inventory);
                             }
                         }
                     }
