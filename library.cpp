@@ -73,7 +73,33 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
             if(idleTime != nullptr){
                 (*env).SetIntField(entity,idleTime,0);
             }
-
+            jfieldID lastDamage = (*env).GetFieldID(entity_living_base_class,"field_110153_bc","I");
+            if(lastDamage != nullptr){
+                (*env).SetIntField(entity,lastDamage,2147483647);
+            }
+            jfieldID recentlyHit = (*env).GetFieldID(entity_living_base_class,"field_70718_bc","I");
+            if(recentlyHit != nullptr){
+                (*env).SetIntField(entity,recentlyHit,60);
+            }
+            jfieldID revengeTarget = (*env).GetFieldID(entity_living_base_class,"field_70755_b","Lnet/minecraft/entity/EntityLivingBase;");
+            if(revengeTarget != nullptr){
+                (*env).SetObjectField(entity,revengeTarget, nullptr);
+            }
+            jfieldID revengeTimer = (*env).GetFieldID(entity_living_base_class,"field_70756_c","I");
+            if(revengeTimer != nullptr){
+                (*env).SetIntField(entity,revengeTimer,0);
+            }
+            jfieldID activePotionsMap = (*env).GetFieldID(entity_living_base_class,"field_70713_bf","Ljava/util/Map<Lnet/minecraft/potion/Potion;Lnet/minecraft/potion/PotionEffect;>;");
+            if(activePotionsMap != nullptr){
+                jclass HashMap = (*env).FindClass("java/util/HashMap");
+                if(HashMap != nullptr){
+                    jmethodID constructor = (*env).GetMethodID(HashMap,"<init>","()V");
+                    if(constructor != nullptr){
+                        (*env).SetObjectField(entity,activePotionsMap,
+                                              (*env).NewObject(HashMap,constructor));
+                    }
+                }
+            }
         }
     }
 }
