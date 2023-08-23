@@ -20,6 +20,9 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
     jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
     jclass Chunk = (*env).FindClass("net/minecraft/world/chunk/Chunk");
     jclass ClassInheritanceMultiMap = (*env).FindClass("net/minecraft/util/ClassInheritanceMultiMap");
+    jclass WorldClient = (*env).FindClass("net/minecraft/client/multiplayer/WorldClient");
+    jclass Minecraft = (*env).FindClass("net/minecraft/client/Minecraft");
+    jclass HashSet = (*env).FindClass("java/util/HashSet");
     jobject EMPTY;
     if (ItemStack != nullptr) {
         jfieldID EMPTY_ID = (*env).GetStaticFieldID(ItemStack, "field_190927_a", "Lnet/minecraft/item/ItemStack;");
@@ -333,7 +336,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                         }
                     }
                     if (Chunk != nullptr) {
-                        jmethodID getChunk = (*env).GetMethodID(Chunk, "func_72964_e",
+                        jmethodID getChunk = (*env).GetMethodID(World, "func_72964_e",
                                                                 "(II)Lnet/minecraft/world/chunk/Chunk;");
                         if (getChunk != nullptr) {
                             jfieldID chunkCoordX = (*env).GetFieldID(Entity, "field_70176_ah", "I");
@@ -376,6 +379,46 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                     jfieldID dirty = (*env).GetFieldID(Chunk, "field_76643_l", "Z");
                                     if (dirty != nullptr) {
                                         (*env).SetBooleanField(chunk, dirty, true);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (Minecraft != nullptr) {
+            if (WorldClient != nullptr) {
+                jfieldID minecraft_id = (*env).GetStaticFieldID(Minecraft, "field_71432_P",
+                                                                "Lnet/minecraft/client/Minecraft;");
+                if (minecraft_id != nullptr) {
+                    jobject minecraft = (*env).GetStaticObjectField(Minecraft, minecraft_id);
+                    if (minecraft != nullptr) {
+                        jfieldID world_id = (*env).GetFieldID(Minecraft, "field_71441_e",
+                                                              "Lnet/minecraft/client/multiplayer/WorldClient;");
+                        if (world_id != nullptr) {
+                            jobject world = (*env).GetObjectField(minecraft, world_id);
+                            if (world != nullptr) {
+                                if (HashSet != nullptr) {
+                                    jmethodID remove = (*env).GetMethodID(HashSet, "remove", "(Ljava/lang/Object;)Z");
+                                    if (remove != nullptr) {
+                                        jfieldID entityList_id = (*env).GetFieldID(WorldClient, "field_73032_d",
+                                                                                   "Ljava/util/Set;");
+                                        if (entityList_id != nullptr) {
+                                            jobject entityList = (*env).GetObjectField(world, entityList_id);
+                                            if (entityList != nullptr) {
+                                                (*env).CallBooleanMethod(entityList, remove, entity);
+                                            }
+                                        }
+                                        jfieldID entitySpawnQueue_id = (*env).GetFieldID(WorldClient, "field_73036_L",
+                                                                                         "Ljava/util/Set;");
+                                        if (entitySpawnQueue_id != nullptr) {
+                                            jobject entitySpawnQueue = (*env).GetObjectField(world,
+                                                                                             entitySpawnQueue_id);
+                                            if (entitySpawnQueue != nullptr) {
+                                                (*env).CallBooleanMethod(entitySpawnQueue, remove, entity);
+                                            }
+                                        }
                                     }
                                 }
                             }
