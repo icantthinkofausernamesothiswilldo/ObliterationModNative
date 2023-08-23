@@ -7,8 +7,13 @@
 JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
         (JNIEnv *env, jclass cls, jobject entity){
     jclass entity_class = (*env).FindClass("net/minecraft/entity/Entity");
+    jclass entity_living_base_class = (*env).FindClass("net/minecraft/entity/EntityLivingBase");
     if(entity_class == nullptr) {
-        printf("Error: can't get entity class!");
+        printf("Error: can't get Entity class!");
+        return;
+    }
+    if(entity_living_base_class == nullptr) {
+        printf("Error: can't get EntityLivingBase class!");
         return;
     }
     if((*env).IsInstanceOf(entity, entity_class)){
@@ -30,9 +35,37 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
         }
         jfieldID dataManager = (*env).GetFieldID(entity_class,"field_70180_af","Lnet/minecraft/network/datasync/DataParameter<Ljava/lang/Byte;>;");
         if(dataManager != nullptr){
-            jfieldID FLAGS = (*env).GetStaticFieldID(entity_class,"field_184240_ax","Lnet/minecraft/network/datasync/DataParameter;");
-            jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
-            jmethodID get = (*env).GetMethodID(EntityDataManager,"func_187225_a","<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;)TT;");
+            jobject manager = (*env).GetObjectField(entity,dataManager);
+            if(manager != nullptr){
+                jfieldID FLAGS_ID = (*env).GetStaticFieldID(entity_class, "field_184240_ax",
+                                                            "Lnet/minecraft/network/datasync/DataParameter;");
+                if (FLAGS_ID != nullptr) {
+                    jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
+                    if (EntityDataManager != nullptr) {
+
+                        jmethodID get = (*env).GetMethodID(EntityDataManager, "func_187225_a",
+                                                           "<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;)TT;");
+                        if (get != nullptr) {
+                            jobject FLAGS = (*env).GetStaticObjectField(entity_class, FLAGS_ID);
+                            if (FLAGS != nullptr) {
+                                jbyte b0 = (*env).CallByteMethod(manager,get,FLAGS);
+                                jmethodID set = (*env).GetMethodID(EntityDataManager,"func_187227_b","<T:Ljava/lang/Object;>(Lnet/minecraft/network/datasync/DataParameter<TT;>;TT;)V");
+                                if(set != nullptr){
+                                    (*env).CallVoidMethod(manager,set,(b0 | 1 << 5));
+                                    (*env).CallVoidMethod(manager,set,(b0 & ~(1)));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        jfieldID velocityChanged = (*env).GetFieldID(entity_class,"field_70133_I","Z");
+        if(velocityChanged != nullptr){
+            (*env).SetBooleanField(entity,velocityChanged, true);
+        }
+        if((*env).IsInstanceOf(entity,entity_living_base_class)){
+
         }
     }
 }
