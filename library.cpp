@@ -223,8 +223,8 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                     jmethodID set = (*env).GetMethodID(EntityDataManager, "func_187227_b",
                                                                        "(Lnet/minecraft/network/datasync/DataParameter;Ljava/lang/Object;)V");
                                     if (set != nullptr) {
-                                        std::cout << "Set AI_FLAGS to (byte)1.\n";
-                                        (*env).CallVoidMethod(manager, set, AI_FLAGS, 1);
+                                        std::cout << "Set AI_FLAGS to null.\n";
+                                        (*env).CallVoidMethod(manager, set, AI_FLAGS, nullptr);
                                     }
                                 }
                             }
