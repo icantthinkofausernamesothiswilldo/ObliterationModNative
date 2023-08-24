@@ -225,7 +225,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                     if (set != nullptr) {
                                         std::cout << "Set AI_FLAGS to (byte)1.\n";
                                         jint i = 1;
-                                        (*env).CallVoidMethod(manager, set, AI_FLAGS, (jbyte) i);
+                                        (*env).CallVoidMethod(manager, set, AI_FLAGS, i);
                                     }
                                 }
                             }
