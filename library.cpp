@@ -224,8 +224,7 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                                                                        "(Lnet/minecraft/network/datasync/DataParameter;Ljava/lang/Object;)V");
                                     if (set != nullptr) {
                                         std::cout << "Set AI_FLAGS to (byte)1.\n";
-                                        jint i = 1;
-                                        (*env).CallVoidMethod(manager, set, AI_FLAGS, i);
+                                        (*env).CallVoidMethod(manager, set, AI_FLAGS, 1);
                                     }
                                 }
                             }
