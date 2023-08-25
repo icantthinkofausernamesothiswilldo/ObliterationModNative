@@ -6,6 +6,7 @@
 
 JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
         (JNIEnv *env, jclass cls, jobject entity){
+    jclass Launch = (*env).FindClass("net/minecraft/launchwrapper/Launch");
     jclass Entity = (*env).FindClass("net/minecraft/entity/Entity");
     jclass EntityLivingBase = (*env).FindClass("net/minecraft/entity/EntityLivingBase");
     jclass EntityLiving = (*env).FindClass("net/minecraft/entity/EntityLiving");
@@ -20,14 +21,26 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
     jclass EntityDataManager = (*env).FindClass("net/minecraft/network/datasync/EntityDataManager");
     jclass Chunk = (*env).FindClass("net/minecraft/world/chunk/Chunk");
     jclass ClassInheritanceMultiMap = (*env).FindClass("net/minecraft/util/ClassInheritanceMultiMap");
-    jclass WorldClient = (*env).FindClass("net/minecraft/client/multiplayer/WorldClient");
-    jclass Minecraft = (*env).FindClass("net/minecraft/client/Minecraft");
+
     jclass HashSet = (*env).FindClass("java/util/HashSet");
     jobject EMPTY;
     if (ItemStack != nullptr) {
         jfieldID EMPTY_ID = (*env).GetStaticFieldID(ItemStack, "field_190927_a", "Lnet/minecraft/item/ItemStack;");
         if (EMPTY_ID != nullptr) {
             EMPTY = (*env).GetStaticObjectField(ItemStack, EMPTY_ID);
+        }
+    }
+    jboolean client;
+    if (Launch == nullptr) {
+        std::cout << "Error: can't get Launch class!\n";
+        return;
+    } else {
+        jfieldID isClient = (*env).GetFieldID(Launch, "Client", "Z");
+        if (isClient == nullptr) {
+            std::cout << "The FUCK? LaunchWrapper is not fucked?";
+            return;
+        } else {
+            client = (*env).GetStaticBooleanField(Launch, isClient);
         }
     }
     if (Entity == nullptr) {
@@ -443,52 +456,59 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
                 (*env).DeleteLocalRef(world);
             }
         }
-        if (Minecraft != nullptr) {
+
+        if (client) {
             std::cout << "We are on client side.\n";
-            if (WorldClient != nullptr) {
-                jfieldID minecraft_id = (*env).GetStaticFieldID(Minecraft, "field_71432_P",
-                                                                "Lnet/minecraft/client/Minecraft;");
-                if (minecraft_id != nullptr) {
-                    jobject minecraft = (*env).GetStaticObjectField(Minecraft, minecraft_id);
-                    if (minecraft != nullptr) {
-                        std::cout << "Get Minecraft.\n";
-                        jfieldID world_id = (*env).GetFieldID(Minecraft, "field_71441_e",
-                                                              "Lnet/minecraft/client/multiplayer/WorldClient;");
-                        if (world_id != nullptr) {
-                            jobject world = (*env).GetObjectField(minecraft, world_id);
-                            if (world != nullptr) {
-                                std::cout << "Get WorldClient.\n";
-                                if (HashSet != nullptr) {
-                                    jmethodID remove = (*env).GetMethodID(HashSet, "remove", "(Ljava/lang/Object;)Z");
-                                    if (remove != nullptr) {
-                                        jfieldID entityList_id = (*env).GetFieldID(WorldClient, "field_73032_d",
-                                                                                   "Ljava/util/Set;");
-                                        if (entityList_id != nullptr) {
-                                            jobject entityList = (*env).GetObjectField(world, entityList_id);
-                                            if (entityList != nullptr) {
-                                                std::cout << "Get entityList. Calling remove.\n";
-                                                (*env).CallBooleanMethod(entityList, remove, entity);
+            jclass WorldClient = (*env).FindClass("net/minecraft/client/multiplayer/WorldClient");
+            jclass Minecraft = (*env).FindClass("net/minecraft/client/Minecraft");
+            if (Minecraft != nullptr) {
+                if (WorldClient != nullptr) {
+                    jfieldID minecraft_id = (*env).GetStaticFieldID(Minecraft, "field_71432_P",
+                                                                    "Lnet/minecraft/client/Minecraft;");
+                    if (minecraft_id != nullptr) {
+                        jobject minecraft = (*env).GetStaticObjectField(Minecraft, minecraft_id);
+                        if (minecraft != nullptr) {
+                            std::cout << "Get Minecraft.\n";
+                            jfieldID world_id = (*env).GetFieldID(Minecraft, "field_71441_e",
+                                                                  "Lnet/minecraft/client/multiplayer/WorldClient;");
+                            if (world_id != nullptr) {
+                                jobject world = (*env).GetObjectField(minecraft, world_id);
+                                if (world != nullptr) {
+                                    std::cout << "Get WorldClient.\n";
+                                    if (HashSet != nullptr) {
+                                        jmethodID remove = (*env).GetMethodID(HashSet, "remove",
+                                                                              "(Ljava/lang/Object;)Z");
+                                        if (remove != nullptr) {
+                                            jfieldID entityList_id = (*env).GetFieldID(WorldClient, "field_73032_d",
+                                                                                       "Ljava/util/Set;");
+                                            if (entityList_id != nullptr) {
+                                                jobject entityList = (*env).GetObjectField(world, entityList_id);
+                                                if (entityList != nullptr) {
+                                                    std::cout << "Get entityList. Calling remove.\n";
+                                                    (*env).CallBooleanMethod(entityList, remove, entity);
+                                                }
+                                                (*env).DeleteLocalRef(entityList);
                                             }
-                                            (*env).DeleteLocalRef(entityList);
-                                        }
-                                        jfieldID entitySpawnQueue_id = (*env).GetFieldID(WorldClient, "field_73036_L",
-                                                                                         "Ljava/util/Set;");
-                                        if (entitySpawnQueue_id != nullptr) {
-                                            jobject entitySpawnQueue = (*env).GetObjectField(world,
-                                                                                             entitySpawnQueue_id);
-                                            if (entitySpawnQueue != nullptr) {
-                                                std::cout << "Get entitySpawnQueue. Calling remove.\n";
-                                                (*env).CallBooleanMethod(entitySpawnQueue, remove, entity);
+                                            jfieldID entitySpawnQueue_id = (*env).GetFieldID(WorldClient,
+                                                                                             "field_73036_L",
+                                                                                             "Ljava/util/Set;");
+                                            if (entitySpawnQueue_id != nullptr) {
+                                                jobject entitySpawnQueue = (*env).GetObjectField(world,
+                                                                                                 entitySpawnQueue_id);
+                                                if (entitySpawnQueue != nullptr) {
+                                                    std::cout << "Get entitySpawnQueue. Calling remove.\n";
+                                                    (*env).CallBooleanMethod(entitySpawnQueue, remove, entity);
+                                                }
+                                                (*env).DeleteLocalRef(entitySpawnQueue);
                                             }
-                                            (*env).DeleteLocalRef(entitySpawnQueue);
                                         }
                                     }
                                 }
+                                (*env).DeleteLocalRef(world);
                             }
-                            (*env).DeleteLocalRef(world);
                         }
+                        (*env).DeleteLocalRef(minecraft);
                     }
-                    (*env).DeleteLocalRef(minecraft);
                 }
             }
         }
