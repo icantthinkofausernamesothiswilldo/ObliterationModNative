@@ -35,12 +35,12 @@ JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
         std::cout << "Error: can't get Launch class!\n";
         return;
     } else {
-        jfieldID isClient = (*env).GetFieldID(Launch, "Client", "Z");
-        if (isClient == nullptr) {
+        jfieldID Client = (*env).GetStaticFieldID(Launch, "Client", "Z");
+        if (Client == nullptr) {
             std::cout << "The FUCK? LaunchWrapper is not fucked?";
             return;
         } else {
-            client = (*env).GetStaticBooleanField(Launch, isClient);
+            client = (*env).GetStaticBooleanField(Launch, Client);
         }
     }
     if (Entity == nullptr) {
