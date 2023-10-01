@@ -1,8 +1,10 @@
 
-#include <iostream>
+#include <bits/stdc++.h>
 #include "miku_lib_common_Native_NativeUtil.h"
 
-
+std::unordered_map<jstring,std::unordered_map<jobject,jobject>> maps;
+std::unordered_map<jstring,std::unordered_set<jobject>> lists;
+std::unordered_map<jint,jobject> saved_objects;
 
 JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_Kill
         (JNIEnv *env, jclass cls, jobject entity){
@@ -525,4 +527,59 @@ JNIEXPORT jint JNICALL Java_miku_lib_common_Native_NativeUtil_TEST
 JNIEXPORT jclass JNICALL Java_miku_lib_common_Native_NativeUtil_GetClass
         (JNIEnv *env, jclass cls, jstring clazz) {
     return (*env).FindClass(reinterpret_cast<const char *>(clazz));
+}
+
+JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_MikuMapPut
+  (JNIEnv *env, jclass cls,jstring map , jobject key, jobject value){
+      maps[map][key] = value;
+}
+
+JNIEXPORT jobject JNICALL Java_miku_lib_common_Native_NativeUtil_MikuMapGet
+  (JNIEnv *env, jclass cls,jstring map , jobject key){
+      return maps[map][key];
+}
+
+JNIEXPORT jboolean JNICALL Java_miku_lib_common_Native_NativeUtil_MikuMapContains
+  (JNIEnv *env, jclass cls, jstring map, jobject key){
+      return maps[map].count(key);
+}
+
+JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_MikuListAdd
+  (JNIEnv *env, jclass cls, jstring list, jobject value){
+      lists[list].insert(value);
+}
+
+JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_MikuListRemove
+  (JNIEnv *env, jclass cls, jstring list, jobject value){
+      lists[list].erase(value);
+}
+
+JNIEXPORT jboolean JNICALL Java_miku_lib_common_Native_NativeUtil_MikuListContains
+  (JNIEnv *env, jclass cls, jstring list, jobject value){
+      return lists[list].count(value);
+}
+
+JNIEXPORT jobjectArray JNICALL Java_miku_lib_common_Native_NativeUtil_GetObjectsFromList
+  (JNIEnv *env, jclass cls, jstring list){
+      std::unordered_set<jobject> target = lists[list];
+      jclass Object = (*env).FindClass("java/lang/Object");
+      jobjectArray result = (*env).NewObjectArray(target.size(),Object,nullptr);
+      int i = 0;
+      for(jobject object : target){
+          (*env).SetObjectArrayElement(result,i,object);
+          i++;
+    }
+    return result;
+}
+
+JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_SaveObject
+  (JNIEnv *env, jclass cls, jobject obj, jint hash){
+      jclass Obj = (*env).FindClass("java/lang/Object");
+      jmethodID clone = (*env).GetMethodID(Obj,"clone","()Ljava/lang/Object;");
+      saved_objects[hash] = (*env).CallObjectMethod(obj,clone);
+}
+
+JNIEXPORT jobject JNICALL Java_miku_lib_common_Native_NativeUtil_GetSavedObject
+  (JNIEnv *env, jclass cls, jint hash){
+      return saved_objects[hash];
 }
