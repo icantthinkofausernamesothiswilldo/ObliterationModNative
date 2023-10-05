@@ -571,15 +571,3 @@ JNIEXPORT jobjectArray JNICALL Java_miku_lib_common_Native_NativeUtil_GetObjects
     }
     return result;
 }
-
-JNIEXPORT void JNICALL Java_miku_lib_common_Native_NativeUtil_SaveObject
-  (JNIEnv *env, jclass cls, jobject obj, jint hash){
-      jclass Obj = (*env).FindClass("java/lang/Object");
-      jmethodID clone = (*env).GetMethodID(Obj,"clone","()Ljava/lang/Object;");
-      saved_objects[hash] = (*env).CallObjectMethod(obj,clone);
-}
-
-JNIEXPORT jobject JNICALL Java_miku_lib_common_Native_NativeUtil_GetSavedObject
-  (JNIEnv *env, jclass cls, jint hash){
-      return saved_objects[hash];
-}
